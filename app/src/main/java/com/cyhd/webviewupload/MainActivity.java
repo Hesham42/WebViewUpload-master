@@ -1,5 +1,6 @@
 package com.cyhd.webviewupload;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -47,7 +48,15 @@ public class MainActivity extends AppCompatActivity {
         settings.setJavaScriptEnabled(true);
         mWebView.loadUrl("file:///android_asset/upload_image.html");
     }
+    @Override
+    public void onBackPressed() {
+        if (mWebView.canGoBack()) {
+            mWebView.goBack();
+        } else {
+            super.onBackPressed();
 
+        }
+    }
 
     private class MyWebViewClient extends WebViewClient {
 
@@ -63,10 +72,11 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            Log.d(TAG, "URL地址:" + url);
+            Log.d(TAG, "URL address:" + url);
             super.onPageStarted(view, url, favicon);
         }
 
+        @SuppressLint("LongLogTag")
         @Override
         public void onPageFinished(WebView view, String url) {
             Log.i(TAG, "onPageFinished");
@@ -79,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
         // For Android 3.0+
         public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType) {
-            Log.d(TAG,"openFileChooser");
+            Log.d(TAG, "openFileChooser");
             if (mUploadMessage != null) return;
             mUploadMessage = uploadMsg;
             selectImage();
@@ -114,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         if (!FileUtils.checkSDcard(this)) {
             return;
         }
-        String[] selectPicTypeStr = {"拍照", "图库"};
+        String[] selectPicTypeStr = {"Taking pictures", "Gallery"};
         new AlertDialog.Builder(this)
                 .setOnCancelListener(new ReOnCancelListener())
                 .setItems(selectPicTypeStr,
@@ -122,11 +132,11 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {
-                                    // 相机拍摄
+                                    // Camera shooting
                                     case 0:
                                         openCarcme();
                                         break;
-                                    // 手机相册
+                                    // Phone Album
                                     case 1:
                                         chosePicture();
                                         break;
@@ -149,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 选择照片后结束
+     * End after selecting photos
      *
      * @param data
      */
@@ -159,20 +169,21 @@ public class MainActivity extends AppCompatActivity {
             if (path != null && (path.endsWith(".png") || path.endsWith(".PNG") || path.endsWith(".jpg") || path.endsWith(".JPG"))) {
                 return data.getData();
             } else {
-                Toast.makeText(this, "上传的图片仅支持png或jpg格式", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Uploaded image only supports png or jpg format", Toast.LENGTH_SHORT).show();
             }
         }
         return null;
     }
 
     /**
-     * 打开照相机
+     * Open the camera
      */
     private void openCarcme() {
 
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         String imagePaths = Environment.getExternalStorageDirectory().getPath() + "/BigMoney/Images/" + (System.currentTimeMillis() + ".jpg");
-        // 必须确保文件夹路径存在，否则拍照后无法完成回调
+        // You must ensure that the folder path exists,
+        // otherwise the callback cannot be completed after taking a picture
         File vFile = new File(imagePaths);
         if (!vFile.exists()) {
             File vDirPath = vFile.getParentFile();
@@ -189,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     /**
-     * 返回文件选择
+     * Return to file selection
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -217,8 +228,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     /**
-     * 5.0以后机型 返回文件选择
-     *
+     * After 5.0 models Return to file selection     *
      * @param requestCode
      * @param resultCode
      * @param data
@@ -246,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     /**
-     * dialog监听类
+     * Dialog listener class
      */
     private class ReOnCancelListener implements DialogInterface.OnCancelListener {
         @Override
